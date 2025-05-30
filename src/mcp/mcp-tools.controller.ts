@@ -9,7 +9,7 @@ export class McpToolsController {
     private readonly todoItemsService: TodoItemsService,
   ) {}
 
-@Post('todo-item')
+@Post()
   async handleTodoPrompt(@Body('prompt') prompt: string) {
     const extractionPrompt = `
     Eres un asistente que transforma instrucciones en JSON para manipular ítems de listas de tareas.
