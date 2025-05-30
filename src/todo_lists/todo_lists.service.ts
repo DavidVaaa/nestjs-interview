@@ -5,11 +5,9 @@ import { TodoList } from '../interfaces/todo_list.interface';
 
 @Injectable()
 export class TodoListsService {
-  private readonly todolists: TodoList[];
+  private readonly todolists: TodoList[] = []; // ✅ inicializado acá
 
-  constructor(todoLists: TodoList[] = []) {
-    this.todolists = todoLists;
-  }
+  constructor() {} // ✅ sin parámetros
 
   all(): TodoList[] {
     return this.todolists;
@@ -26,33 +24,24 @@ export class TodoListsService {
     };
 
     this.todolists.push(todoList);
-
     return todoList;
   }
 
   update(id: number, dto: UpdateTodoListDto): TodoList {
     const todolist = this.todolists.find((x) => x.id == Number(id));
-
-    // Update the record
     todolist.name = dto.name;
-
     return todolist;
   }
 
   delete(id: number): void {
     const index = this.todolists.findIndex((x) => x.id == Number(id));
-
     if (index > -1) {
       this.todolists.splice(index, 1);
     }
   }
 
   private nextId(): number {
-    const last = this.todolists
-      .map((x) => x.id)
-      .sort()
-      .reverse()[0];
-
+    const last = this.todolists.map((x) => x.id).sort().reverse()[0];
     return last ? last + 1 : 1;
   }
 }

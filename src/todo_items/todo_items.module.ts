@@ -4,6 +4,7 @@ import { TodoItemsController } from './todo_items.controller';
 
 @Module({
   providers: [TodoItemsService],
-  controllers: [TodoItemsController]
+  controllers: [TodoItemsController],
+  exports: [TodoItemsService],
 })
 export class TodoItemsModule {}
