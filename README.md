@@ -76,7 +76,8 @@ This project is a NestJS-based backend API designed to manage Todo Lists and int
 1. The client sends an HTTP request to the MCP endpoints with a specified tool and input.  
 2. The **McpService** dynamically selects the correct tool handler and executes it with the provided input.  
 3. For todo item manipulations, the tools call appropriate methods on `TodoItemsService`.  
-4. For AI integration, the tool sends prompts to Claude via `ClaudeService`, which communicates with the Claude API.  
+4. For AI integration, the tool sends prompts to Claude via `ClaudeService`, which communicates with the Claude API. 
+   The endpoint made for the communication between Claude (with natural language) is /mcp/tools
 5. The **McpToolsController** can receive natural language instructions, format a prompt for Claude to translate those instructions into a JSON command (e.g., create, update, complete, delete todo item), then execute the respective todo item operation.  
 6. Results are returned to the client, either as the outcome of todo operations or AI responses.
 
