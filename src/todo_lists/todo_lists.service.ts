@@ -5,10 +5,9 @@ import { TodoList } from '../interfaces/todo_list.interface';
 
 @Injectable()
 export class TodoListsService {
-  private readonly todolists: TodoList[] = []; // ✅ inicializado acá
+  private readonly todolists: TodoList[] = []; 
 
-  constructor() {} // ✅ sin parámetros
-
+  constructor() {} 
   all(): TodoList[] {
     return this.todolists;
   }

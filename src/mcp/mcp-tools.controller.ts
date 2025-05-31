@@ -5,78 +5,88 @@ import { TodoItemsService } from '../todo_items/todo_items.service';
 @Controller('mcp/tools')
 export class McpToolsController {
   constructor(
-    private readonly claudeService: ClaudeService,
-    private readonly todoItemsService: TodoItemsService,
+    private readonly claudeService: ClaudeService,    // Service to send prompts to Claude AI
+    private readonly todoItemsService: TodoItemsService,  // Service to manipulate todo items in DB
   ) {}
 
-@Post()
+  @Post()
   async handleTodoPrompt(@Body('prompt') prompt: string) {
+    // Compose a detailed prompt to Claude to convert natural language instructions
+    // into a structured JSON action for manipulating todo list items.
     const extractionPrompt = `
-    Eres un asistente que transforma instrucciones en JSON para manipular ítems de listas de tareas.
-    Dado un texto, devuelve el JSON con la acción y los parámetros necesarios. Usa estos formatos:
+    You are an assistant that transforms instructions into JSON commands for managing todo list items.
+    Given a text input, return JSON with the action and necessary parameters. Use these formats:
 
-    Para crear:
+    To create:
     {
-    "action": "createItem",
-    "listName": "Trabajo",
-    "description": "Terminar informe"
+      "action": "createItem",
+      "listName": "Work",
+      "description": "Finish report"
     }
 
-    Para actualizar:
+    To update:
     {
-    "action": "updateItem",
-    "itemId": "123",
-    "description": "Descripción nueva"
+      "action": "updateItem",
+      "itemId": "123",
+      "description": "New description"
     }
 
-    Para completar:
+    To complete:
     {
-    "action": "completeItem",
-    "itemId": "123"
+      "action": "completeItem",
+      "itemId": "123"
     }
 
-    Para eliminar:
+    To delete:
     {
-    "action": "deleteItem",
-    "itemId": "123"
+      "action": "deleteItem",
+      "itemId": "123"
     }
 
-    Entrada: "${prompt}"
-    Salida:
+    Input: "${prompt}"
+    Output:
     `;
 
+    // Send the prompt to Claude AI service and get raw response
     const rawResponse = await this.claudeService.sendMcpPrompt(extractionPrompt);
 
-    // EXTRAER texto JSON desde la estructura recibida
+    // Extract the JSON text from the AI response; fallback if simple string
     const rawText =
-        rawResponse?.content?.[0]?.text ||
-        rawResponse; // fallback si es un string simple
+      rawResponse?.content?.[0]?.text || rawResponse;
 
     let parsed;
     try {
-        parsed = JSON.parse(rawText);
+      // Parse the JSON returned by Claude
+      parsed = JSON.parse(rawText);
     } catch (err) {
-        return { error: 'Claude no devolvió un JSON válido.', detalle: rawResponse };
+      // Return error if Claude's output is not valid JSON
+      return { error: 'Claude did not return valid JSON.', detail: rawResponse };
     }
 
+    // Perform the appropriate todo item action based on parsed JSON 'action' field
     switch (parsed.action) {
-        case 'createItem':
+      case 'createItem':
+        // Create a new todo item; listName is assumed to be list ID here
         return this.todoItemsService.create({
-          listId: parsed.listName, // ← asumimos que listName = ID
+          listId: parsed.listName,
           description: parsed.description,
         });
 
-        case 'updateItem':
+      case 'updateItem':
+        // Update the description of an existing todo item
         return this.todoItemsService.update(parsed.itemId, parsed.description);
 
-        case 'completeItem':
+      case 'completeItem':
+        // Mark a todo item as complete
         return this.todoItemsService.complete(parsed.itemId);
 
-        case 'deleteItem':
+      case 'deleteItem':
+        // Delete a todo item
         return this.todoItemsService.delete(parsed.itemId);
 
-        default:
-        return { error: `Acción no reconocida: ${parsed.action}` };
+      default:
+        // Return error if the action is unknown
+        return { error: `Unrecognized action: ${parsed.action}` };
     }
-    }
+  }
 }

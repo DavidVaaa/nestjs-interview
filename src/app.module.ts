@@ -8,7 +8,7 @@ import { ClaudeModule } from './claude/claude.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }), // ✅ DEBE ir primero
+    ConfigModule.forRoot({ isGlobal: true }),
     HttpModule,
     TodoListsModule,
     TodoItemsModule,

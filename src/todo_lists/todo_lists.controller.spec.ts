@@ -9,8 +9,8 @@ describe('TodoListsController', () => {
 
   beforeEach(async () => {
     todoListService = new TodoListsService([
-      { id: 1, name: 'test1' },
-      { id: 2, name: 'test2' },
+      { 'test1' },
+      { 'test2' },
     ]);
 
     const app: TestingModule = await Test.createTestingModule({
